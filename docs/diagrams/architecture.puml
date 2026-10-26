@@ -1,0 +1,38 @@
+@startuml architecture
+title System Architecture
+skinparam componentStyle rectangle
+skinparam shadowing false
+
+actor Developer
+actor "Browser User" as User
+
+package "Docker Host (docker compose)" {
+  node "jenkins :8080" as J {
+    component "Pipeline Engine" as PE
+    component "Trivy CLI" as TR
+    component "SonarScanner" as SS
+  }
+  node "sonarqube :9000" as SQ {
+    component "Analysis + Quality Gate" as QG
+  }
+  node "nginx :8081 -> 80" as NG {
+    component "Static Site" as SITE
+  }
+  database "jenkins_home" as JH
+  database "sonarqube_* volumes" as SV
+  folder "./website (bind mount)" as WEB
+}
+
+cloud "Git Repository" as GIT
+
+Developer --> GIT : git push
+GIT --> PE : checkout (Jenkinsfile)
+PE --> TR : fs / image scan
+PE --> SS : analyze
+SS --> QG : HTTP (sonarqube:9000)
+PE --> WEB : deploy to\n/var/jenkins_home/deployment
+WEB --> SITE : mounted at /var/www/html
+User --> SITE : HTTP :8081
+J --> JH
+SQ --> SV
+@enduml

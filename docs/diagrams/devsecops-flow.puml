@@ -1,0 +1,16 @@
+@startuml devsecops-flow
+title Shift-Left Security Flow
+skinparam shadowing false
+left to right direction
+rectangle "Commit" as C
+rectangle "Static analysis\n(SonarQube)" as SA
+rectangle "Dependency / FS scan\n(Trivy fs)" as FS
+rectangle "Image scan\n(Trivy image)" as IM
+rectangle "Approval" as AP
+rectangle "Deploy\n(Nginx)" as D
+C --> SA
+SA --> FS
+FS --> IM
+IM --> AP
+AP --> D
+@enduml

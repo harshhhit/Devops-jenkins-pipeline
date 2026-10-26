@@ -1,0 +1,20 @@
+@startuml pipeline-sequence
+title Basic Pipeline - Sequence
+skinparam shadowing false
+actor Developer
+participant Git
+participant Jenkins
+participant Trivy
+participant "./website\n(shared mount)" as Web
+participant Nginx
+actor Browser
+
+Developer -> Git : push commit
+Jenkins -> Git : checkout scm
+Jenkins -> Trivy : trivy fs website/
+Trivy --> Jenkins : HIGH/CRITICAL report
+Jenkins -> Web : rm old files, cp new files
+Web --> Nginx : visible at /var/www/html
+Browser -> Nginx : GET http://localhost:8081
+Nginx --> Browser : updated index.html
+@enduml

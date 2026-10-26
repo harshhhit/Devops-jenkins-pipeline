@@ -1,0 +1,29 @@
+@startuml advanced-pipeline-activity
+title Advanced Pipeline - Activity
+skinparam shadowing false
+start
+:Checkout;
+:SonarQube analysis;
+if (Quality gate passed?) then (yes)
+else (no)
+  #pink:Abort pipeline;
+  stop
+endif
+:Trivy filesystem scan;
+if (HIGH/CRITICAL found?) then (yes)
+  #pink:Fail build;
+  stop
+else (no)
+endif
+:Build Docker image;
+:Trivy image scan;
+if (HIGH/CRITICAL found?) then (yes)
+  #pink:Fail build;
+  stop
+else (no)
+endif
+:Manual approval (input);
+:Deploy to ./website;
+:Archive trivy-report.json;
+stop
+@enduml

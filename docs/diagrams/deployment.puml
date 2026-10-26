@@ -1,0 +1,25 @@
+@startuml deployment
+title Container, Port and Volume Map
+skinparam shadowing false
+node "Host" {
+  node "nginx (container)" as N {
+    [nginx process] as NP
+  }
+  node "jenkins (container)" as J
+  node "sonarqube (container)" as S
+  folder "./website" as W
+  database "jenkins_home" as JH
+  database "sonarqube_data" as SD
+  database "sonarqube_extensions" as SE
+  database "sonarqube_logs" as SL
+}
+N -- W : /var/www/html
+J -- W : /var/jenkins_home/deployment
+J -- JH : /var/jenkins_home
+S -- SD : /opt/sonarqube/data
+S -- SE : /opt/sonarqube/extensions
+S -- SL : /opt/sonarqube/logs
+note right of N : host 8081 -> 80
+note right of J : host 8080 -> 8080
+note right of S : host 9000 -> 9000
+@enduml
